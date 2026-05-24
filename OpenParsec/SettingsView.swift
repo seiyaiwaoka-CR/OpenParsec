@@ -18,6 +18,7 @@ struct SettingsView:View
 	@AppStorage("decoderCompatibility") var decoderCompatibility: Bool = false // Enable for stutter issues on some devices
 	@AppStorage("showKeyboardButton") var showKeyboardButton: Bool = true
 	@AppStorage("saveSessionSettings") var saveSessionSettings: Bool = true
+	@AppStorage("externalDisplayAutoTransfer") var externalDisplayAutoTransfer: Bool = true
 	
 	let resolutionChoices: [Choice<ParsecResolution>]
 
@@ -172,6 +173,11 @@ struct SettingsView:View
 							CatItem("Save Session Settings")
 							{
 								Toggle("", isOn:$saveSessionSettings)
+									.frame(width:80)
+							}
+							CatItem("Auto-Transfer to External Display")
+							{
+								Toggle("", isOn:$externalDisplayAutoTransfer)
 									.frame(width:80)
 							}
 						}

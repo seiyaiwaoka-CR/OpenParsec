@@ -270,17 +270,26 @@ class ParsecViewController: UIViewController, UIScrollViewDelegate {
 	
 	override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
 		super.viewWillTransition(to: size, with: coordinator)
-		
+
 		let h = size.height
 		let w = size.width
-		
+
 		// Reset zoom on rotation
 		scrollView.zoomScale = 1.0
 
-		self.glkView.updateSize(width: w, height: h)
+		// When streaming externally, the stream resolution follows the external display,
+		// not this iPad scroll/content view. Only resize the local containers here.
+		let streamingExternally: Bool = {
+			if #available(iOS 13.0, *) { return self.isStreamingExternally }
+			return false
+		}()
+
+		if !streamingExternally {
+			self.glkView.updateSize(width: w, height: h)
+			CParsec.setFrame(w, h, UIScreen.main.scale)
+		}
 		contentView.frame.size = CGSize(width: w, height: h)
 		scrollView.contentSize = CGSize(width: w, height: h)
-		CParsec.setFrame(w, h, UIScreen.main.scale)
         
         // Reset accessory view to ensure correct width in new orientation
         keyboardAccessoriesView = nil
@@ -299,8 +308,11 @@ class ParsecViewController: UIViewController, UIScrollViewDelegate {
 			becomeFirstResponder()
 		}
 		scrollView.pinchGestureRecognizer?.isEnabled = zoomEnabled
+		if #available(iOS 13.0, *) {
+			registerForExternalDisplay()
+		}
 	}
-	
+
 	override func viewWillDisappear(_ animated: Bool) {
 		super.viewWillDisappear(animated)
 		if let parent = parent {
@@ -309,6 +321,9 @@ class ParsecViewController: UIViewController, UIScrollViewDelegate {
 		}
 		NotificationCenter.default.removeObserver(self, name: UIResponder.keyboardWillShowNotification, object: nil)
 		NotificationCenter.default.removeObserver(self, name: UIResponder.keyboardWillHideNotification, object: nil)
+		if #available(iOS 13.0, *) {
+			unregisterFromExternalDisplay()
+		}
 	}
 	
 	
