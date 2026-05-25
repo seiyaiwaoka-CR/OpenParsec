@@ -5,7 +5,6 @@ extension ParsecViewController {
 
 	private struct ExternalDisplayState {
 		static var streamingExternally: Bool = false
-		static var hostedExternal: Bool = false
 	}
 
 	var isStreamingExternally: Bool {
@@ -49,7 +48,8 @@ extension ParsecViewController {
 	func attachStreamToExternal(host: ExternalDisplayHostViewController) {
 		guard !ExternalDisplayState.streamingExternally else { return }
 		guard let parsecGLK = self.glkView as? ParsecGLKViewController else { return }
-		guard let externalWindow = ExternalDisplayCoordinator.shared.externalWindow else { return }
+		guard let externalScreen = ExternalDisplayCoordinator.shared.externalScreen,
+		      let externalWindow = ExternalDisplayCoordinator.shared.externalWindow else { return }
 
 		let glkVC = parsecGLK.glkViewController
 		let glkView = parsecGLK.glkView
@@ -63,20 +63,23 @@ extension ParsecViewController {
 		host.showStreamView(glkVC.view)
 		glkVC.didMove(toParent: host)
 
-		let extSize = externalWindow.bounds.size
-		let extScale = externalWindow.screen.scale
+		// Force layout so glkView.frame reflects external window bounds before we call setFrame.
+		externalWindow.layoutIfNeeded()
+		host.view.layoutIfNeeded()
+
+		// Use the external screen's pixel-accurate size, not the freshly-created window bounds.
+		let extSize = externalScreen.bounds.size
+		let extScale = externalScreen.scale
 		glkView?.frame = CGRect(origin: .zero, size: extSize)
+		glkView?.contentScaleFactor = extScale
 		self.glkView.updateSize(width: extSize.width, height: extSize.height)
 		CParsec.setFrame(extSize.width, extSize.height, extScale)
 		CParsec.updateHostVideoConfig()
 
-		// Hide cursor overlay on iPad while streaming externally
 		self.u?.isHidden = true
 
 		ExternalDisplayState.streamingExternally = true
-		ExternalDisplayState.hostedExternal = true
 
-		// Disable PiP while external is active (its EAGLContext linkage is tied to main view)
 		if #available(iOS 15.0, *) {
 			PictureInPictureManager.shared.stopPiP()
 		}
@@ -96,22 +99,22 @@ extension ParsecViewController {
 
 		self.addChild(glkVC)
 		self.contentView.addSubview(glkVC.view)
-		if let glkView = glkView {
-			glkVC.view = glkView
+		if let glkView = glkView, glkVC.view !== glkView {
 			self.contentView.addSubview(glkView)
 		}
 		glkVC.didMove(toParent: self)
 
 		let size = self.view.bounds.size
+		let scale = self.view.window?.screen.scale ?? UIScreen.main.scale
 		glkView?.frame = CGRect(origin: .zero, size: size)
+		glkView?.contentScaleFactor = scale
 		self.glkView.updateSize(width: size.width, height: size.height)
-		CParsec.setFrame(size.width, size.height, UIScreen.main.scale)
+		CParsec.setFrame(size.width, size.height, scale)
 		CParsec.updateHostVideoConfig()
 
 		self.u?.isHidden = false
 
 		ExternalDisplayState.streamingExternally = false
-		ExternalDisplayState.hostedExternal = false
 
 		ExternalDisplayCoordinator.shared.externalHost?.clearStreamView()
 	}

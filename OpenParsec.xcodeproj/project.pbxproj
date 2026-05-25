@@ -44,7 +44,6 @@
 		FC16A7AD29A97BDA00BB70A7 /* Shared.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC16A7AC29A97BDA00BB70A7 /* Shared.swift */; };
 		EDCD0000000000000000A001 /* ExternalDisplayCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = EDCD0000000000000000A002 /* ExternalDisplayCoordinator.swift */; };
 		EDCD0000000000000000B001 /* ExternalDisplayHostViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = EDCD0000000000000000B002 /* ExternalDisplayHostViewController.swift */; };
-		EDCD0000000000000000C001 /* ExternalDisplaySceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = EDCD0000000000000000C002 /* ExternalDisplaySceneDelegate.swift */; };
 		EDCD0000000000000000D001 /* ParsecViewController+ExternalDisplay.swift in Sources */ = {isa = PBXBuildFile; fileRef = EDCD0000000000000000D002 /* ParsecViewController+ExternalDisplay.swift */; };
 /* End PBXBuildFile section */
 
@@ -103,7 +102,6 @@
 		FC16A7AC29A97BDA00BB70A7 /* Shared.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Shared.swift; sourceTree = "<group>"; };
 		EDCD0000000000000000A002 /* ExternalDisplayCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExternalDisplayCoordinator.swift; sourceTree = "<group>"; };
 		EDCD0000000000000000B002 /* ExternalDisplayHostViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExternalDisplayHostViewController.swift; sourceTree = "<group>"; };
-		EDCD0000000000000000C002 /* ExternalDisplaySceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExternalDisplaySceneDelegate.swift; sourceTree = "<group>"; };
 		EDCD0000000000000000D002 /* ParsecViewController+ExternalDisplay.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ParsecViewController+ExternalDisplay.swift"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -178,7 +176,6 @@
 				EDCD0000000000000000D002 /* ParsecViewController+ExternalDisplay.swift */,
 				EDCD0000000000000000A002 /* ExternalDisplayCoordinator.swift */,
 				EDCD0000000000000000B002 /* ExternalDisplayHostViewController.swift */,
-				EDCD0000000000000000C002 /* ExternalDisplaySceneDelegate.swift */,
 				27E61A99292965FD00FF6563 /* Preview Content */,
 				27E61A93292965FC00FF6563 /* SceneDelegate.swift */,
 				27A267342B1AEAB700F34C63 /* SettingsHandler.swift */,
@@ -329,7 +326,6 @@
 				271D14F9292E90EB00D7F1D6 /* ParsecView.swift in Sources */,
 				EDCD0000000000000000A001 /* ExternalDisplayCoordinator.swift in Sources */,
 				EDCD0000000000000000B001 /* ExternalDisplayHostViewController.swift in Sources */,
-				EDCD0000000000000000C001 /* ExternalDisplaySceneDelegate.swift in Sources */,
 				EDCD0000000000000000D001 /* ParsecViewController+ExternalDisplay.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

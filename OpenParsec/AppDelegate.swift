@@ -7,16 +7,17 @@ class AppDelegate: UIResponder, UIApplicationDelegate
 	{
 		// Override point for customization after application launch.
 		UTMViewControllerPatches.patchAll()
+		if #available(iOS 13.0, *) {
+			ExternalDisplayCoordinator.shared.bootstrap()
+		}
 		return true
 	}
 
 	func application(_ application: UIApplication, configurationForConnecting connectingSceneSession: UISceneSession, options: UIScene.ConnectionOptions) -> UISceneConfiguration
 	{
-		let role = connectingSceneSession.role
-		if #available(iOS 16.0, *), role == .windowExternalDisplayNonInteractive {
-			return UISceneConfiguration(name: "External Display Configuration", sessionRole: role)
-		}
-		return UISceneConfiguration(name: "Default Configuration", sessionRole: role)
+		// Called when a new scene session is being created.
+		// Use this method to select a configuration to create the new scene with.
+		return UISceneConfiguration(name: "Default Configuration", sessionRole: connectingSceneSession.role)
 	}
 
 	func application(_ application: UIApplication, didDiscardSceneSessions sceneSessions: Set<UISceneSession>)
