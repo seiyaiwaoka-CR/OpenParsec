@@ -176,6 +176,13 @@ class ParsecViewController: UIViewController, UIScrollViewDelegate {
          (for moving the mouse).
          Standard 2-finger pan will scroll the view.
          */
+		if #available(iOS 13.4, *) {
+			// Do NOT let mouse-wheel scroll events drive the iPad scroll view —
+			// those events must reach the host as wheel messages instead. The
+			// trackpad continuous-scroll path is still allowed so 2-finger pan
+			// of the host-resolution canvas keeps working.
+			scrollView.panGestureRecognizer.allowedScrollTypesMask = [.continuous]
+		}
 		view.addSubview(scrollView)
 
         // ContentView
@@ -223,6 +230,14 @@ class ParsecViewController: UIViewController, UIScrollViewDelegate {
 		// No, we want 1 finger for this pan, 2 fingers for scrollview.
 		// So they are distinct by touch count.
 		view.addGestureRecognizer(panGestureRecognizer)
+
+		// Capture mouse-wheel scroll (discrete scroll type) and forward to host.
+		if #available(iOS 13.4, *) {
+			let mouseWheelPan = UIPanGestureRecognizer(target: self, action: #selector(self.handleMouseWheelPan(_:)))
+			mouseWheelPan.allowedScrollTypesMask = [.discrete]
+			mouseWheelPan.delegate = self
+			view.addGestureRecognizer(mouseWheelPan)
+		}
 
 		// Remove custom Pinch logic, ScrollView handles it.
 		// But we might want to know isPinching status?
@@ -398,6 +413,21 @@ extension ParsecViewController : UIGestureRecognizerDelegate {
 
 	@objc func handlePinchGesture(_ gestureRecognizer: UIPinchGestureRecognizer) {
 		// Pinch is handled by UIScrollView
+	}
+
+	@available(iOS 13.4, *)
+	@objc func handleMouseWheelPan(_ gestureRecognizer: UIPanGestureRecognizer) {
+		// Mouse-wheel deltas arrive as UIPanGestureRecognizer translation when
+		// the allowedScrollTypesMask is .discrete. We send the translation
+		// since the last invocation as a wheel message to the host, then reset
+		// so subsequent firings are pure delta.
+		let translation = gestureRecognizer.translation(in: gestureRecognizer.view)
+		let dx = Int32(translation.x)
+		let dy = Int32(translation.y)
+		if dx != 0 || dy != 0 {
+			CParsec.sendWheelMsg(x: dx, y: dy)
+			gestureRecognizer.setTranslation(.zero, in: gestureRecognizer.view)
+		}
 	}
 
 	@objc func handlePanGesture(_ gestureRecognizer: UIPanGestureRecognizer)

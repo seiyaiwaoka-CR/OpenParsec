@@ -67,6 +67,13 @@ extension ParsecViewController {
 		let extSize = externalScreen.bounds.size
 		let extScale = externalScreen.scale
 		glkView?.frame = CGRect(origin: .zero, size: extSize)
+		// Critical: explicitly set contentScaleFactor so GLKView recreates its
+		// drawable at the EXTERNAL display's pixel density. Without this the
+		// drawable stays at the iPad's (often larger) scale, the SDK fills only
+		// a subset of the external drawable, and the stream ends up rendered
+		// in a corner of the external display.
+		glkView?.contentScaleFactor = extScale
+		glkView?.layer.contentsScale = extScale
 		self.glkView.updateSize(width: extSize.width, height: extSize.height)
 		CParsec.setFrame(extSize.width, extSize.height, extScale)
 		CParsec.updateHostVideoConfig()
@@ -97,9 +104,12 @@ extension ParsecViewController {
 		glkVC.didMove(toParent: self)
 
 		let size = self.view.bounds.size
+		let scale = self.view.window?.screen.scale ?? UIScreen.main.scale
 		glkView?.frame = CGRect(origin: .zero, size: size)
+		glkView?.contentScaleFactor = scale
+		glkView?.layer.contentsScale = scale
 		self.glkView.updateSize(width: size.width, height: size.height)
-		CParsec.setFrame(size.width, size.height, UIScreen.main.scale)
+		CParsec.setFrame(size.width, size.height, scale)
 		CParsec.updateHostVideoConfig()
 
 		self.u?.isHidden = false
