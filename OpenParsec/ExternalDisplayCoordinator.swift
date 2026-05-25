@@ -21,7 +21,12 @@ final class ExternalDisplayCoordinator {
 
 	private init() {}
 
-	func bootstrap() {
+	/// Install UIScreen observers and adopt any already-attached external display.
+	/// This is opt-in — only called when the user has explicitly enabled the
+	/// external-display feature, so a default install behaves exactly like
+	/// upstream OpenParsec.
+	func enableIfNeeded() {
+		guard SettingsHandler.externalDisplayAutoTransfer else { return }
 		guard !didInstallObservers else { return }
 		didInstallObservers = true
 
@@ -37,15 +42,18 @@ final class ExternalDisplayCoordinator {
 			name: UIScreen.didDisconnectNotification,
 			object: nil
 		)
+	}
 
-		// Adopt any external screen already attached at launch.
-		for screen in UIScreen.screens where screen !== UIScreen.main {
-			attachToScreen(screen)
-			break
-		}
+	/// Allow the Settings UI to fully shut the feature off without an app restart.
+	func disable() {
+		NotificationCenter.default.removeObserver(self, name: UIScreen.didConnectNotification, object: nil)
+		NotificationCenter.default.removeObserver(self, name: UIScreen.didDisconnectNotification, object: nil)
+		didInstallObservers = false
+		detachFromScreen()
 	}
 
 	@objc private func handleScreenDidConnect(_ note: Notification) {
+		guard SettingsHandler.externalDisplayAutoTransfer else { return }
 		guard let screen = note.object as? UIScreen, screen !== UIScreen.main else { return }
 		attachToScreen(screen)
 	}
@@ -69,9 +77,7 @@ final class ExternalDisplayCoordinator {
 		self.externalHost = host
 
 		NotificationCenter.default.post(name: .externalDisplayHostReady, object: nil)
-		if SettingsHandler.externalDisplayAutoTransfer {
-			tryAttachStream()
-		}
+		tryAttachStream()
 	}
 
 	private func detachFromScreen() {
@@ -85,17 +91,11 @@ final class ExternalDisplayCoordinator {
 
 	func registerActiveParsec(_ vc: ParsecViewController?) {
 		self.activeParsecVC = vc
-		if vc != nil, isExternalActive, SettingsHandler.externalDisplayAutoTransfer {
-			tryAttachStream()
-		}
 	}
 
 	func tryAttachStream() {
+		guard SettingsHandler.externalDisplayAutoTransfer else { return }
 		guard let host = externalHost, let parsec = activeParsecVC else { return }
 		parsec.attachStreamToExternal(host: host)
-	}
-
-	func detachStream() {
-		activeParsecVC?.restoreStreamFromExternal()
 	}
 }

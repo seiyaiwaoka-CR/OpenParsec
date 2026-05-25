@@ -12,6 +12,9 @@ extension ParsecViewController {
 	}
 
 	func registerForExternalDisplay() {
+		// Coordinator only installs UIScreen observers if the feature toggle is on,
+		// so this call has no observable effect when the user hasn't opted in.
+		ExternalDisplayCoordinator.shared.enableIfNeeded()
 		ExternalDisplayCoordinator.shared.registerActiveParsec(self)
 		NotificationCenter.default.addObserver(
 			self,
@@ -37,7 +40,6 @@ extension ParsecViewController {
 	}
 
 	@objc private func externalHostReadyNotification() {
-		guard SettingsHandler.externalDisplayAutoTransfer else { return }
 		ExternalDisplayCoordinator.shared.tryAttachStream()
 	}
 
@@ -48,8 +50,7 @@ extension ParsecViewController {
 	func attachStreamToExternal(host: ExternalDisplayHostViewController) {
 		guard !ExternalDisplayState.streamingExternally else { return }
 		guard let parsecGLK = self.glkView as? ParsecGLKViewController else { return }
-		guard let externalScreen = ExternalDisplayCoordinator.shared.externalScreen,
-		      let externalWindow = ExternalDisplayCoordinator.shared.externalWindow else { return }
+		guard let externalScreen = ExternalDisplayCoordinator.shared.externalScreen else { return }
 
 		let glkVC = parsecGLK.glkViewController
 		let glkView = parsecGLK.glkView
@@ -63,15 +64,9 @@ extension ParsecViewController {
 		host.showStreamView(glkVC.view)
 		glkVC.didMove(toParent: host)
 
-		// Force layout so glkView.frame reflects external window bounds before we call setFrame.
-		externalWindow.layoutIfNeeded()
-		host.view.layoutIfNeeded()
-
-		// Use the external screen's pixel-accurate size, not the freshly-created window bounds.
 		let extSize = externalScreen.bounds.size
 		let extScale = externalScreen.scale
 		glkView?.frame = CGRect(origin: .zero, size: extSize)
-		glkView?.contentScaleFactor = extScale
 		self.glkView.updateSize(width: extSize.width, height: extSize.height)
 		CParsec.setFrame(extSize.width, extSize.height, extScale)
 		CParsec.updateHostVideoConfig()
@@ -99,17 +94,12 @@ extension ParsecViewController {
 
 		self.addChild(glkVC)
 		self.contentView.addSubview(glkVC.view)
-		if let glkView = glkView, glkVC.view !== glkView {
-			self.contentView.addSubview(glkView)
-		}
 		glkVC.didMove(toParent: self)
 
 		let size = self.view.bounds.size
-		let scale = self.view.window?.screen.scale ?? UIScreen.main.scale
 		glkView?.frame = CGRect(origin: .zero, size: size)
-		glkView?.contentScaleFactor = scale
 		self.glkView.updateSize(width: size.width, height: size.height)
-		CParsec.setFrame(size.width, size.height, scale)
+		CParsec.setFrame(size.width, size.height, UIScreen.main.scale)
 		CParsec.updateHostVideoConfig()
 
 		self.u?.isHidden = false

@@ -16,7 +16,11 @@ struct SettingsHandler {
 	@AppStorage("decoderCompatibility") public static var decoderCompatibility: Bool = false // Enable for stutter issues on some devices
 	@AppStorage("showKeyboardButton") public static var showKeyboardButton: Bool = true
 
-	@AppStorage("externalDisplayAutoTransfer") public static var externalDisplayAutoTransfer: Bool = true
+	// Defaults to OFF: external display support is opt-in to keep the iPad-only
+	// behavior identical to upstream when the user hasn't asked for it.
+	// Key was renamed from `externalDisplayAutoTransfer` to force a reset for
+	// anyone who had the buggy v1/v2 build installed.
+	@AppStorage("externalDisplayEnabled_v2") public static var externalDisplayAutoTransfer: Bool = false
 
 	@AppStorage("saveSessionSettings") public static var saveSessionSettings: Bool = true
 	@AppStorage("savedZoomEnabled") public static var savedZoomEnabled: Bool = false

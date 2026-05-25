@@ -7,9 +7,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate
 	{
 		// Override point for customization after application launch.
 		UTMViewControllerPatches.patchAll()
-		if #available(iOS 13.0, *) {
-			ExternalDisplayCoordinator.shared.bootstrap()
-		}
 		return true
 	}
 
