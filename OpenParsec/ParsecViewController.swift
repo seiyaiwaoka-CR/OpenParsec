@@ -39,7 +39,7 @@ class ParsecViewController: UIViewController, UIScrollViewDelegate {
 	var contentView: UIView!
 
 	override var prefersPointerLocked: Bool {
-		return true
+		return SettingsHandler.pointerLockEnabled
 	}
 	
 	override var prefersHomeIndicatorAutoHidden : Bool {

@@ -19,6 +19,8 @@ struct SettingsView:View
 	@AppStorage("showKeyboardButton") var showKeyboardButton: Bool = true
 	@AppStorage("saveSessionSettings") var saveSessionSettings: Bool = true
 	@AppStorage("externalDisplayEnabled_v2") var externalDisplayAutoTransfer: Bool = false
+	@AppStorage("renderAtHostResolution") var renderAtHostResolution: Bool = false
+	@AppStorage("pointerLockEnabled") var pointerLockEnabled: Bool = true
 	
 	let resolutionChoices: [Choice<ParsecResolution>]
 
@@ -178,6 +180,16 @@ struct SettingsView:View
 							CatItem("External Display (Experimental)")
 							{
 								Toggle("", isOn:$externalDisplayAutoTransfer)
+									.frame(width:80)
+							}
+							CatItem("Render at Host Resolution")
+							{
+								Toggle("", isOn:$renderAtHostResolution)
+									.frame(width:80)
+							}
+							CatItem("Lock Pointer to Stream")
+							{
+								Toggle("", isOn:$pointerLockEnabled)
 									.frame(width:80)
 							}
 						}

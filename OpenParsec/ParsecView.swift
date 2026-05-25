@@ -117,6 +117,9 @@ struct ParsecView: View
 	@State var muted: Bool = false
 	@State var preferH265: Bool = true
 	@State var constantFps = false
+
+	@AppStorage("renderAtHostResolution") var renderAtHostResolution: Bool = false
+	@AppStorage("pointerLockEnabled") var pointerLockEnabled: Bool = true
 	
 	@State var resolutions: [ParsecResolution]
 	@State var bitrates: [Int]
@@ -339,6 +342,18 @@ struct ParsecView: View
 				}
 			}
 			disconnect(isBackgroundDisconnect: true)
+		}
+		.onChange(of: dataModel.resolutionX) { _ in
+			parsecViewController.applyRenderResolution()
+		}
+		.onChange(of: dataModel.resolutionY) { _ in
+			parsecViewController.applyRenderResolution()
+		}
+		.onChange(of: renderAtHostResolution) { _ in
+			parsecViewController.applyRenderResolution()
+		}
+		.onChange(of: pointerLockEnabled) { _ in
+			parsecViewController.setNeedsUpdateOfPrefersPointerLocked()
 		}
 		.edgesIgnoringSafeArea(.all)
 

@@ -22,6 +22,18 @@ struct SettingsHandler {
 	// anyone who had the buggy v1/v2 build installed.
 	@AppStorage("externalDisplayEnabled_v2") public static var externalDisplayAutoTransfer: Bool = false
 
+	// Render the remote stream at host-native resolution into a large
+	// content area, with the iPad scroll view acting as a viewport you
+	// can pan/zoom around. Default OFF (= upstream behavior: stream
+	// scaled to the iPad screen).
+	@AppStorage("renderAtHostResolution") public static var renderAtHostResolution: Bool = false
+
+	// When ON (default), iPad captures the system pointer into the stream
+	// so a connected USB mouse / trackpad drives the host cursor directly.
+	// Turn OFF if you need the system pointer to interact with OpenParsec's
+	// own overlay buttons (Parsec logo, keyboard, etc.) using a mouse.
+	@AppStorage("pointerLockEnabled") public static var pointerLockEnabled: Bool = true
+
 	@AppStorage("saveSessionSettings") public static var saveSessionSettings: Bool = true
 	@AppStorage("savedZoomEnabled") public static var savedZoomEnabled: Bool = false
 	@AppStorage("savedConstantFps") public static var savedConstantFps: Bool = false
